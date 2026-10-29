@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="add-todo-container">
+      <h2>add a new todo</h2>
+
+      <form action="/addtodo" method="post">
+        <input type="text" name="task" id="" />
+        <button type="submit">submit</button>
+      </form>
+    </div>
+
+    <table class="todos">
+      <tr>
+        <td>task</td>
+        <td>status</td>
+        <td>update status</td>
+        <td>delete</td>
+      </tr>
+      <% for( let i = 0; i < todos.length; i++ ) { %>
+        <tr>
+            <td><%= todos[i].task %></td>
+            <td> <%=  todos[i].isDone?"Done":"Pending"  %></td>
+            <td><form action=""><button>update</button></form></td>
+            <td><button>delete</button></td>
+        </tr>
+      <% } %>
+    </table>
+
+  
+  </body>
+
+
+</html>
