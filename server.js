@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
 const app = express();
 
@@ -21,7 +21,7 @@ app.get("/", async function (req, res) {
     .db(dbName)
     .collection(collectionName)
     .find()
-    .toArray();
+    .toArray();  
   res.render("index.ejs", { todos: data });
 });
 
@@ -42,6 +42,25 @@ app.post("/addtodo", async function (req, res) {
   res.redirect("/");
 ;
 });
+
+
+app.get('/update/:id',async function(req,res){
+  const todoId=req.params.id
+  await client
+    .db(dbName)
+    .collection(collectionName)
+    .updateOne({_id:new ObjectId(todoId)},{$set:{isDone:true}}) 
+    res.redirect('/')
+})
+
+app.get('/delete/:id',async function(req,res){
+  const todoId=req.params.id
+  await client
+    .db(dbName)
+    .collection(collectionName)
+    .deleteOne({_id:new ObjectId(todoId)}) 
+    res.redirect('/')
+})
 
 app.listen(3000, function () {
   client

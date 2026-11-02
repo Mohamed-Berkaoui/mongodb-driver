@@ -27,8 +27,17 @@
         <tr>
             <td><%= todos[i].task %></td>
             <td> <%=  todos[i].isDone?"Done":"Pending"  %></td>
-            <td><form action=""><button>update</button></form></td>
-            <td><button>delete</button></td>
+            <td>
+              <form action="/update/<%= todos[i]._id %>" method="get">
+                
+                <button type="submit">update</button>
+              </form>
+            </td>
+            <td>
+               <form action="/delete/<%= todos[i]._id %>" method="get">
+                 <button type="submit">delete</button>
+               </form>
+            </td>
         </tr>
       <% } %>
     </table>
