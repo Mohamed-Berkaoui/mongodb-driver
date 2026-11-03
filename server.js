@@ -1,13 +1,20 @@
 const express = require("express");
-const { MongoClient, ObjectId } = require("mongodb");
+const { default: mongoose } = require("mongoose");
 
 const app = express();
 
 const URI =
   "mongodb+srv://mohamed:ljJd92Dia8Si7RfL@cluster0.heetub1.mongodb.net/";
-const client = new MongoClient(URI);
-const dbName = "todoapp";
-const collectionName = "todos";
+
+const todoSchema = new mongoose.Schema(
+  {
+    task: { type: String, required: true },
+    isDone: { type: Boolean, default: false },
+  },
+  { versionKey: false },
+);
+
+const TodoModel = mongoose.model("todo", todoSchema);
 
 app.use(express.static(__dirname + "/styles"));
 
@@ -17,11 +24,8 @@ app.use(express.static(__dirname + "/styles"));
  */
 
 app.get("/", async function (req, res) {
-  const data = await client
-    .db(dbName)
-    .collection(collectionName)
-    .find()
-    .toArray();  
+  const data = await TodoModel.find();
+
   res.render("index.ejs", { todos: data });
 });
 
@@ -35,36 +39,27 @@ app.post("/addtodo", async function (req, res) {
   //req => headers,url,method , req.body =>{task:value}
 
   const newtodo = {
-    isDone: false,
     task: req.body.task,
   };
-  await client.db(dbName).collection(collectionName).insertOne(newtodo);
+  await TodoModel.insertOne(newtodo);
   res.redirect("/");
-;
 });
 
+app.get("/update/:id", async function (req, res) {
+  const todoId = req.params.id;
+  await TodoModel.updateOne({ _id: todoId }, { $set: { isDone: true } });
+  res.redirect("/");
+});
 
-app.get('/update/:id',async function(req,res){
-  const todoId=req.params.id
-  await client
-    .db(dbName)
-    .collection(collectionName)
-    .updateOne({_id:new ObjectId(todoId)},{$set:{isDone:true}}) 
-    res.redirect('/')
-})
-
-app.get('/delete/:id',async function(req,res){
-  const todoId=req.params.id
-  await client
-    .db(dbName)
-    .collection(collectionName)
-    .deleteOne({_id:new ObjectId(todoId)}) 
-    res.redirect('/')
-})
+app.get("/delete/:id", async function (req, res) {
+  const todoId = req.params.id;
+  await TodoModel.deleteOne({ _id: todoId });
+  res.redirect("/");
+});
 
 app.listen(3000, function () {
-  client
-    .connect()
+  mongoose
+    .connect(URI, { dbName: "test" })
     .then(() => console.log("connected to db"))
     .catch((e) => console.log(e.message));
   console.log("server running on port 3000");
